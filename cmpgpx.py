@@ -215,13 +215,21 @@ if __name__ == "__main__":
     a1, a2 = align_tracks(gpx1_points, gpx2_points, gap_penalty)
 
     # Calculate map bounding box with padding
+    # get_bounds() does not work for routes - bounds manually calculated instead
     padding_pct = 10
-    bounds1 = gpx1.get_bounds()
-    bounds2 = gpx2.get_bounds()
-    bbox1 = gfx.add_padding((bounds1.min_longitude, bounds1.min_latitude,
-                             bounds1.max_longitude, bounds1.max_latitude), 10)
-    bbox2 = gfx.add_padding((bounds2.min_longitude, bounds2.min_latitude,
-                             bounds2.max_longitude, bounds2.max_latitude), 10)
+    gpx1_min_longitude = min([p.longitude for p in gpx1_points])
+    gpx1_min_latitude = min([p.latitude for p in gpx1_points])
+    gpx1_max_longitude = max([p.longitude for p in gpx1_points])
+    gpx1_max_latitude = max([p.latitude for p in gpx1_points])
+    bbox1 = gfx.add_padding((gpx1_min_longitude, gpx1_min_latitude,
+                         gpx1_max_longitude, gpx1_max_latitude), 10)
+    gpx2_min_longitude = min([p.longitude for p in gpx2_points])
+    gpx2_min_latitude = min([p.latitude for p in gpx2_points])
+    gpx2_max_longitude = max([p.longitude for p in gpx2_points])
+    gpx2_max_latitude = max([p.latitude for p in gpx2_points])
+    bbox2 = gfx.add_padding((gpx2_min_longitude, gpx2_min_latitude,
+                         gpx2_max_longitude, gpx2_max_latitude), 10)
+    
     bbox = (min(bbox1[0], bbox2[0]), min(bbox1[1], bbox2[1]),
             max(bbox1[2], bbox2[2]), max(bbox1[3], bbox2[3]))
 

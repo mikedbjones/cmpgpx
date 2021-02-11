@@ -7,6 +7,23 @@ import gpxpy
 _log = logging.getLogger(__name__)
 
 
+def stats(points):
+    """
+    Returns time & distance stats for track
+    """
+    
+    start_time = points[0].time
+    finish_time = points[-1].time
+    elapsed_time = finish_time - start_time
+    
+    dists = [gpxpy.geo.distance(points[i].latitude, points[i].longitude, None, points[i+1].latitude, points[i+1].longitude, None) for i in range(0, len(points)-1)]
+    total_dist = sum(dists)
+    
+    intervals = [points[i+1].time - points[i].time for i in range(0, len(points) - 1)]
+    min_interval = min(intervals).seconds
+    
+    return [start_time, finish_time, elapsed_time, total_dist, min_interval]
+
 def bearing(point1, point2):
     """
     Calculates the initial bearing between point1 and point2 relative to north

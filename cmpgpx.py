@@ -154,8 +154,35 @@ if __name__ == "__main__":
     gap_penalty = -args.cutoff
 
     # Join all the points from all segments for the track into a single list
-    gpx1_points = [p for s in gpx1.tracks[0].segments for p in s.points]
-    gpx2_points = [p for s in gpx2.tracks[0].segments for p in s.points]
+    # Handle routes or tracks as needed
+    if gpx1.tracks:
+        _log.info("Processing track-formed GPX1")
+        gpx1_points = [p for s in gpx1.tracks[0].segments for p in s.points]
+    else:
+        _log.info("Processing route-formed GPX1")
+        gpx1_points = [p for p in gpx1.routes[0].points]
+    if gpx2.tracks:
+        _log.info("Processing track-formed GPX2")
+        gpx2_points = [p for s in gpx2.tracks[0].segments for p in s.points]
+    else:
+        _log.info("Processing route-formed GPX2")
+        gpx2_points = [p for p in gpx2.routes[0].points]
+        
+    # Calculate stats
+    _log.info("Calculating stats for Track 1...")
+    stats = geo.stats(gpx1_points)
+    start_time = stats[0]
+    finish_time = stats[1]
+    elapsed_time = stats[2]
+    total_dist = stats[3]
+    min_interval = stats[4]
+    
+    # Output gpx_file1 stats
+    _log.info("Track 1 start time: {}".format(start_time))
+    _log.info("Track 1 finish time: {}".format(finish_time))
+    _log.info("Track 1 elapsed time: {}".format(elapsed_time))
+    _log.info("Track 1 total distance: {:.2f} km / {:.2f} miles".format(total_dist/1000, total_dist/1609.34))
+    _log.info("Track 1 minimum interval: {} second(s)".format(min_interval))
 
     # Determines whether gpx1_points is a loop (tolerance 100m) and rotates it to start of gpx2_points if so
     # If a loop, reverses the loop if needed

@@ -20,6 +20,21 @@ import numpy
 import geo
 import gfx
 
+def output_even_track(gpx_points, filename):
+    """
+    Output even track as a GPX file
+    """
+    
+    _log.info("Outputting evenly distributed track to {}".format(filename))
+    gpx_even = gpxpy.gpx.GPX()
+    gpx_even_track = gpxpy.gpx.GPXTrack()
+    gpx_even.tracks.append(gpx_even_track)
+    gpx_even_segment = gpxpy.gpx.GPXTrackSegment()
+    gpx_even_track.segments.append(gpx_even_segment)
+    gpx_even_segment.points = gpx_points
+    file = open(filename, 'w')
+    file.write(gpx_even.to_xml())
+    file.close()
 
 def align_tracks(track1, track2, gap_penalty):
     """ Needleman-Wunsch algorithm adapted for gps tracks. """
@@ -120,6 +135,8 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', action='store_true')
     parser.add_argument('-e', '--even', type=int,
                         help="evenly distribute points in meters")
+    parser.add_argument('-g', '--gpx_even_output', action='store_true',
+                        help="output even tracks to gpx files")
     parser.add_argument('-o', '--output-file', default="alignment.png",
                         help="output filename")
     parser.add_argument('-s', '--separate_tracks', action='store_true',
@@ -142,6 +159,9 @@ if __name__ == "__main__":
     if args.even:
         gpx1_points = geo.interpolate_distance(gpx1_points, args.even)
         gpx2_points = geo.interpolate_distance(gpx2_points, args.even)
+        if args.gpx_even_output:
+            output_even_track(gpx1_points, os.path.basename(os.path.splitext(args.gpx_file1.name)[0]) + '_even.gpx')
+            output_even_track(gpx2_points, os.path.basename(os.path.splitext(args.gpx_file2.name)[0]) + '_even.gpx')
 
     # Run the alignment
     a1, a2 = align_tracks(gpx1_points, gpx2_points, gap_penalty)
